@@ -7,7 +7,7 @@
 	cmake --build .
 	./test/test_main
 
-Возможно понадобиться библиотеку fmt:
+Возможно понадобится установить библиотеку fmt:
 
     brew install fmt
 
