@@ -6,7 +6,7 @@
 int main() {
     document_like doc;
 
-    doc.add("age", 20);
+    doc.add("age", 22);
     doc.add("is_student", true);
     doc.add("name", std::string("Ayubjon Umarov"));
     doc.add("grades", std::vector<int>({85, 90, 78}));

@@ -6,3 +6,8 @@
 	cmake .. -DCMAKE_BUILD_TYPE=Release
 	cmake --build .
 	./test/test_main
+
+Возможно понадобиться библиотеку fmt:
+
+    brew install fmt
+
