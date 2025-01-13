@@ -1,6 +1,6 @@
 # DocumentLike
 
-Запуск из главной диретории:
+Запуск из главной директории:
 
 	mkdir build && cd build
 	cmake .. -DCMAKE_BUILD_TYPE=Release
