@@ -7,7 +7,6 @@
 #include <string_view>
 #include <string>
 #include <vector>
-#include <type_traits>
 #include <cstring>
 #include <fstream>
 
@@ -15,41 +14,27 @@ class document_like {
 public:
     using value_type = std::variant<int, bool, std::string, std::vector<int>, struct no_value>;
 
-    document_like(const std::string& filename);
-
-    ~document_like();
+    explicit document_like(const std::string& filename);
 
     void add(std::string_view key, const value_type& value);
 
-    const value_type& get(std::string_view key) const noexcept;
+    const value_type get(std::string_view key) const;
 
     void remove(std::string_view key) noexcept;
 
 private:
     static value_type create_empty_value();
+    static value_type read_value_at_offset(std::fstream& file, size_t offset, int type_id);
+    int get_type_id_from_offset(size_t offset) const;
 
     std::string filename_;
-    std::unordered_map<std::string, std::pair<value_type, size_t>> data_;
-    std::fstream file_;
-
-    struct FreeBlock {
-        size_t offset;
-        size_t size;
-    };
-
-    std::vector<FreeBlock> free_blocks_;
-
-    void load_index();
-    void save_index();
-
-    size_t get_free_offset();
-    void remove_offset(size_t offset);
-
-    void write_value(const value_type& value, size_t offset);
-    value_type read_value_at_offset(size_t offset);
+    mutable std::unordered_map<std::string, size_t> data_; // offset
+    mutable std::fstream file_;
 
     template<typename T>
     static int get_type_id();
+
+    void write_value(const value_type& value, size_t offset) const;
 };
 
 struct no_value {
@@ -59,5 +44,4 @@ struct no_value {
     }
 };
 
-#endif
-
+#endif // DOCUMENT_LIKE_HPP
