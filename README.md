@@ -2,10 +2,16 @@
 
 Запуск из главной директории:
 
-	mkdir build && cd build
-	cmake .. -DCMAKE_BUILD_TYPE=Release
-	cmake --build .
-	./test/test_main
+	g++ -std=c++17 -o document_like_executable src/document_like.cpp main.cpp
+
+------------------------------------------------------------------------------------
+    ./document_like_executable <filename>
+
+Например:
+
+    ./document_like_executable document.dat
+    
+------------------------------------------------------------------------------------
 
 Возможно понадобится установить библиотеку fmt:
 

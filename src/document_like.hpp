@@ -1,34 +1,63 @@
-#pragma once
+#ifndef DOCUMENT_LIKE_HPP
+#define DOCUMENT_LIKE_HPP
 
-#include <string_view>
+#include <iostream>
 #include <unordered_map>
 #include <variant>
-#include <vector>
+#include <string_view>
 #include <string>
+#include <vector>
+#include <type_traits>
+#include <cstring>
+#include <fstream>
 
 class document_like {
 public:
-    void add(std::string_view key, const int& value);
-    void add(std::string_view key, const bool& value);
-    void add(std::string_view key, const std::string& value);
-    void add(std::string_view key, const std::vector<int>& value);
+    using value_type = std::variant<int, bool, std::string, std::vector<int>, struct no_value>;
 
-    template<typename T>
-    const T& get(std::string_view key) const noexcept {
-        static T default_value{};
-        auto it = data.find(std::string(key));
-        if (it != data.end()) {
-            return std::get<T>(it->second);
-        }
-        return default_value;
-    }
+    document_like(const std::string& filename);
+
+    ~document_like();
+
+    void add(std::string_view key, const value_type& value);
+
+    const value_type& get(std::string_view key) const noexcept;
 
     void remove(std::string_view key) noexcept;
 
-    void write_to_disk(const std::string& filename) const;
-    void read_from_disk(const std::string& filename);
-
 private:
-    using ValueVariant = std::variant<int, bool, std::string, std::vector<int>>;
-    std::unordered_map<std::string, ValueVariant> data;
+    static value_type create_empty_value();
+
+    std::string filename_;
+    std::unordered_map<std::string, std::pair<value_type, size_t>> data_;
+    std::fstream file_;
+
+    struct FreeBlock {
+        size_t offset;
+        size_t size;
+    };
+
+    std::vector<FreeBlock> free_blocks_;
+
+    void load_index();
+    void save_index();
+
+    size_t get_free_offset();
+    void remove_offset(size_t offset);
+
+    void write_value(const value_type& value, size_t offset);
+    value_type read_value_at_offset(size_t offset);
+
+    template<typename T>
+    static int get_type_id();
 };
+
+struct no_value {
+    friend std::ostream& operator<<(std::ostream& os, const no_value&) {
+        os << "No value";
+        return os;
+    }
+};
+
+#endif
+
